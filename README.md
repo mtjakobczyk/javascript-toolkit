@@ -204,7 +204,7 @@ There are a few practical aspects to know:
 - The `promisify` function from `util` package can be used to convert a callback-based API to a promise-based one.
 - The function you pass to `then()` is invoked asynchronously, even if the asynchronous computation is already complete when you call `then()`.
 
-###### Promise Chains
+##### Promise Chains
 The `then()` function wrapper a Promise on its own, encapsulating the value returned by the callback function. As a result, you can register sequential chain of callbacks using the following syntax `.then().then().then()` effectively creating the so called **promise chain**. If a preceding promise's callback returns some value, the subsequent promise's callback will be able to process it.
 ```javascript
 // Creating a Promise Chain
@@ -213,6 +213,53 @@ readFilePromise
   .then((contentsLength) => { console.log("Callback 2: "+contentsLength); return contentsLength*2 })
   .then((doubledContentsLength) => { console.log("Callback 3: "+doubledContentsLength) })
 ```
+
+##### await-ing a promise inside an async function
+> The `await` keyword takes a Promise and turns it back into a return value or a thrown exception.
+>
+> The expression `await p` waits until Promise `p` settles
+>
+> Because any code that uses `await` is asynchronous, there is one critical rule: you can only use the `await` keyword within functions that have been declared with the `async` keyword.
+>
+> Source: JavaScript: The Definitive Guide, 7th Edition by David Flanagan
+
+Inside an `async`-prefixed function, it is possible to use the `await` keyword in front of a promise (usually returned by some asynchronous function which returns a promise).
+The `await` keyword will effectively pause the `async`-prefixed function execution until the `await`-ed promise becomes settled (= resolved or rejected). It is important to remember that such a paused execution of an `async`hronous function, does not block the entire program.
+
+```javascript
+async function runReadFile (filePath) {
+  let readFilePromise = readFile(filePath)
+  let contents = await readFilePromise
+  console.log("Step 1")
+  console.log("Step 2") 
+  console.log("Step 3")
+}
+runReadFile('../data/data1.csv').catch( (err) => { throw err } )
+```
+An `async` function always returns a promise. The promise will resolve to whatever is returned inside the async function body.
+
+##### Parallelize await-ing multiple promises inside an async function
+This code reads two files in a seqeunce:
+```javascript
+async function runReadTwoFiles (filePathsArray) {
+  let readFile1Promise = readFile(filePathsArray[0])
+  let contentsFile1 = await readFile1Promise
+  let readFile2Promise = readFile(filePathsArray[1])
+  let contentsFile2 = await readFile2Promise
+  console.log("Reading finished")
+}
+```
+This code reads two files **in parallel**:
+```javascript
+async function runParallelReadTwoFiles (filePathsArray) {
+  let readFile1Promise = readFile(filePathsArray[0])
+  let readFile2Promise = readFile(filePathsArray[1])
+  let [contentsFile1, contentsFile2] = await Promise.all([readFile1Promise, readFile2Promise)]);
+  console.log("Reading finished")
+}
+```
+- If any of the promises fails, `Promise.all` will atomically reject.
+- `Promise.allSettled` can be used to tolerate errors in favor of getting necessary data. See [example](examples/callbacks-promise-allsettled/callbacks-promise-allsettled.js).
 
 
 #### Modules
