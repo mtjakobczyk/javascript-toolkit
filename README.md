@@ -182,19 +182,38 @@ A **callback** is a function that will be called at some future point, once a ta
 - For a callback as fat arrow function (lambda) - see [example](examples/callbacks-fat-arrow/callbacks-fat-arrow.js)
 
 ##### Promises
-A **promise** is an object that represents an asynchronous operation. It's either `pending` or `settled`, and if it is `settled` it's either `resolved` or `rejected`. It is still impossible to synchronously get the value of a Promise; you still register a callback functions for the Promise to call a when the value is ready. Promises represent the future results of single asynchronous computations.
+A **promise** is an object that represents an asynchronous operation. It's either `pending` or `settled`, and if it is `settled` it's either `resolved` or `rejected`. It is impossible to synchronously get the value of a Promise; you still register a callback function(s) for the Promise to call a when the value is ready. Promises represent the future results of single asynchronous computations.
 1. Some asynchronous function returns a `Promise` object, initially in `pending` state. 
 1. On the promise object you use `.then()` to add a callback function. 
-1. The promise object will eventually move to the `settled` state and contain the results of the asynchronous operation (`resolved`) or some error message (`rejected`). When it happens, the promise chain is executed (the registered callbacks are invoked).
+1. The promise object will eventually move to the `settled` state and contain the results of the asynchronous operation (`resolved`) or some error message (`rejected`). When it happens, the promise-registered callback is invoked.
 
-There are a few aspects to understand:
-- The `then()` function returns a Promise on its own. As a result, you can register multiple callbacks using the following syntax `.then().then().` in the so called **promise chain**. 
-- The callbacks registered in a promise chain will be executed in a sequence. 
-- If a callback returns something, the next callback will be able to process it.
+```javascript
+// Registering 3 callbacks for one Promise
+readFilePromise.then((contents) => {
+  console.log("Callback 1");
+})
+readFilePromise.then((contents) => {
+  console.log("Callback 2");
+})
+readFilePromise.then((contents) => {
+  console.log("Callback 3");
+})
+```
+
+There are a few practical aspects to know:
+- The `promisify` function from `util` package can be used to convert a callback-based API to a promise-based one.
 - The function you pass to `then()` is invoked asynchronously, even if the asynchronous computation is already complete when you call `then()`.
 
+###### Promise Chains
+The `then()` function wrapper a Promise on its own, encapsulating the value returned by the callback function. As a result, you can register sequential chain of callbacks using the following syntax `.then().then().then()` effectively creating the so called **promise chain**. If a preceding promise's callback returns some value, the subsequent promise's callback will be able to process it.
+```javascript
+// Creating a Promise Chain
+readFilePromise
+  .then((contents) => { console.log("Callback 1"); return contents.length })
+  .then((contentsLength) => { console.log("Callback 2: "+contentsLength); return contentsLength*2 })
+  .then((doubledContentsLength) => { console.log("Callback 3: "+doubledContentsLength) })
+```
 
-The `promisify` function from `util` package can be used to convert a callback-based API to a promise-based one.
 
 #### Modules
 A **module** is a unit of code. Packages expose modules, modules provide functionality.
@@ -218,6 +237,11 @@ module.exports = { upper: upper }
 ```
 
 ##### ESM
+To get Node enforce EcmaScript Modules, you add the following line in the `package.json`:
+```json
+"type": "module"
+```
+
 In the EcmaScript Modules: 
 - the `import` keyword is used to import values into a module
 - the `export` keyword is used to export values from a module
