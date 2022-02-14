@@ -304,3 +304,10 @@ export const upper = (str) => {
 ```
 
 A Node application (or module) can contain both CJS and ESM files.
+
+# Useful Links
+- https://code.visualstudio.com/docs/editor/debugging#_launch-configurations
+- https://code.visualstudio.com/docs/nodejs/nodejs-debugging
+- https://nodejs.org/dist/latest-v16.x/docs/api/
+- https://developer.mozilla.org/en-US/docs/Web/JavaScript
+- https://docs.npmjs.com/
