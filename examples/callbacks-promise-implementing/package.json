@@ -1,0 +1,9 @@
+{
+  "name": "callbacks-promise-implementing",
+  "description": "description",
+  "type": "module",
+  "authors": "author",
+  "version": "1.0.0",
+  "main": "callbacks-promise-implementing.js",
+  "dependencies": {}
+}

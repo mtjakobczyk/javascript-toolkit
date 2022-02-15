@@ -7,7 +7,13 @@ Loose notes on JavaScript ecosystem
 The original host environment for JavaScript was a web browser. Since 2010, another host environment has been available for JavaScript code. Instead of constraining JavaScript to work with the APIs provided by a web browser, Node gives JavaScript access to the entire operating system, allowing JavaScript programs to read and write files, send and receive data over the network, and make and serve HTTP requests. Source: Wikipedia
 
 ### JavaScript
-JavaScript is a loosely-typed dynamic language. 
+> JavaScript is a prototype-based, multi-paradigm, single-threaded, dynamic language, supporting object-oriented, imperative, and declarative (e.g. functional programming) styles.
+>
+> **Prototype-based programming** is a style of object-oriented programming in which classes are not explicitly defined, but rather derived by adding properties and methods to an instance of another class.
+>
+> In simple words: this type of style allows the creation of an object without first defining its class.
+> 
+> Source: https://developer.mozilla.org/en-US/docs/Web/JavaScript
 
 Constants are declared with `const` and variables are declared with `let`. 
 
@@ -191,10 +197,13 @@ A **callback** is a function that will be called at some future point, once a ta
 - For a callback as fat arrow function (lambda) - see [example](examples/callbacks-fat-arrow/callbacks-fat-arrow.js)
 
 ##### Promises
+- https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise
 A **promise** is an object that represents an asynchronous operation. It's either `pending` or `settled`, and if it is `settled` it's either `resolved` or `rejected`. It is impossible to synchronously get the value of a Promise; you still register a callback function(s) for the Promise to call a when the value is ready. Promises represent the future results of single asynchronous computations.
 1. Some asynchronous function returns a `Promise` object, initially in `pending` state. 
 1. On the promise object you use `.then()` to add a callback function. 
 1. The promise object will eventually move to the `settled` state and contain the results of the asynchronous operation (`resolved`) or some error message (`rejected`). When it happens, the promise-registered callback is invoked.
+
+See a working [example](examples/callbacks-promise-implementing/callbacks-promise-implementing.js) of how a function that returns a Promise can be implemented.
 
 ```javascript
 // Registering 3 callbacks for one Promise
@@ -289,6 +298,48 @@ To cancel asynchronous operations, `AbortController` can be used:
 - https://developer.mozilla.org/en-US/docs/Web/API/AbortController/AbortController
 
 See a working [example](examples/events-aborting/events-aborting.js).
+
+#### Error Handling
+Throwing a predefined `TypeError`:
+```javascript
+if (typeof inputOne !== 'number') throw new TypeError('the input argument must be a number')
+```
+Defining a custom error class:
+```javascript
+class NotFiftyError extends Error {
+  constructor (errorName = '') {
+      super(errorName + ' cannot be 50')
+      this.code = 'ERR_CANNOT_BE_FIFTY'
+  }
+  get name () {
+      return 'NotFiftyError [' + this.code + ']'
+  }
+}
+```
+Throwing the above custom error outputs:
+```
+NotFiftyError [ERR_CANNOT_BE_FIFTY]: the input argument cannot be 50
+...
+code: 'ERR_CANNOT_BE_FIFTY'
+```
+See a working [example](examples/errors/errors.js).
+
+The `try-catch` construct can be used to catch errors thrown in a **synchronous** function:
+```javascript
+try {
+  const result = doSomethingSynchronously()
+  result()
+  console.log('result', result)
+} catch (err) {
+  if (err.code === 'ERR_CANNOT_BE_FIFTY') {
+    console.error('Nope. 50 will not work')
+  } else {
+    console.error('Unknown error', err)
+  }
+}
+```
+Similarly, the `try-catch` construct can be used to catch errors thrown in an **asynchronous** function that `await`s asynchronous operations.
+
 
 #### Modules
 A **module** is a unit of code. Packages expose modules, modules provide functionality.
