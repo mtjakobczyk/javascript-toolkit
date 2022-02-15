@@ -96,6 +96,15 @@ The approaches to create prototype chains:
 - using [Object.create](examples/prototypal-inheritance-functional/prototypal-inheritance-functional.js)
 - using [Class-syntax constructor functions](examples/prototypal-inheritance-classes/prototypal-inheritance-classes.js)
 
+#### Destructuring assignment
+Destructuring assignment
+```javascript
+let paint = {r: 5.0, g: 2.0, b: 3.0, a: 1.0};
+let {r, g, b} = paint;  // r == 5.0; g == 2.0; b == 1.0
+let {a : transparency} = paint;  // transparency = 1.0
+```
+
+
 #### Closures
 When a function is created, a **closure scope** is also created (in a form of an invisible object) and stores parameters and variables created in the function.
 
@@ -261,6 +270,25 @@ async function runParallelReadTwoFiles (filePathsArray) {
 - If any of the promises fails, `Promise.all` will atomically reject.
 - `Promise.allSettled` can be used to tolerate errors in favor of getting necessary data. See [example](examples/callbacks-promise-allsettled/callbacks-promise-allsettled.js).
 
+##### Events
+The `EventEmitter` is used to drive event-driven logic. See a working [example](examples/events/events.js).
+```javascript
+const ee = new EventEmitter()
+// register event handler
+ee.on('tresholdExceeded', (value) => { console.log('fat arrow event handler: Treshold Exceeded '+value) })
+// some time later - emit the event
+ee.emit('tresholdExceeded', 15)
+```
+- The `ee.emit` is used to emit an event and can be executed many times in many places.
+- The `ee.on` registers an event handler. 
+- The `ee.once` registers a single-use listener - a one-time event handler, which is removed as soon as a first event occurs.
+- Emitting an event with `error` name will cause the event emitter to throw an exception unless an explicit listener for the `error` event has been registered
+
+##### Aborting asynchronous operations
+To cancel asynchronous operations, `AbortController` can be used:
+- https://developer.mozilla.org/en-US/docs/Web/API/AbortController/AbortController
+
+See a working [example](examples/events-aborting/events-aborting.js).
 
 #### Modules
 A **module** is a unit of code. Packages expose modules, modules provide functionality.
