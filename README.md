@@ -110,85 +110,10 @@ let {r, g, b} = paint;  // r == 5.0; g == 2.0; b == 1.0
 let {a : transparency} = paint;  // transparency = 1.0
 ```
 
-
 #### Closures
 When a function is created, a **closure scope** is also created (in a form of an invisible object) and stores parameters and variables created in the function.
 
-#### The global object
-The global object is a regular JavaScript object whose properties are the globally defined identifiers that are available to a JavaScript program.
-
-In Node, the global object has a property named `global`.
-
-In web browsers, the Window object (`window`) serves as the global object for all JavaScript code contained in the browser window it represents. Web worker threads have a different global object: `self`.
-
-ES2020 defines `globalThis` as the standard way to refer to the global object in any context
-
-
-### Node.js
-Node.js is a JavaScript runtime built on Chrome's V8 JavaScript engine.
-The Node.js platform is almost entirely represented by the node binary executable. 
-
-To execute a JavaScript program: `node app.js`
-
-To check the syntax of a program: `node --check app.js`
-
-To preload (= execute first) a module (another JavaScript program): `node -r ./preload.js app.js`
-
-By default, a **stack trace** will contain the last ten stack frames (function call sites) at the point where the trace occurred. The stack trace limit can be modified with the `--stack-trace-limit` flag.
-
-To debug launch a program in Inspect mode:
-```bash
-node --inspect app.js
-node --inspect-brk app.js # with an breakpoint at the beginning of the program
-```
-Node.js supports the [Chrome Devtools remote debugging protocol](https://nodejs.org/en/docs/guides/debugging-getting-started/). There are various tools (i.e. Chrome browser - `chrome://inspect`) that support the debugging process. The breakpoints are set and stepped through in the tool chosen for debugging.
-
-#### Packages
-A **package** is basically just a folder with a `package.json` file and one or more JavaScript files.
-A Node.js application is also a package.
-
-The `npm init` command creates (or updates) the `package.json` file.
-
-The **dependencies** are installed with `npm install <name>` command. When you add a dependency:
-1. Its name and version (i.e. `d`) are added to the `dependencies` field in the `package.json` file
-1. The package files (and its dependencies) are added as a folder to `node_modules` folder inside the package folder
-1. The `package-lock.json` file id added/updated to contain a map of all package dependencies with their exact versions
-
-The `node_modules` folder must not be checked into Git. Check in the `package.json`. 
-When you clone a repo, you will then use `npm install` to recreate the `node_modules` folder.
-
-The `npm ls --depth=1000` describes the dependency tree of a package.
-
-The **development dependencies** are tools that support the development process. You can install the packages as development dependencies by using `npm install` with  `--save-dev` option. The development dependencies are added to the `devDependencies` field in the `package.json` file.
-```json
-"dependencies": {
-  "pino": "^7.6.2"
-},
-"devDependencies": {
-  "standard": "^16.0.4"
-}
-```
-When you want to install only production dependencies, but have some development dependencies in the `package.json` file, you can use `npm install` with `--production` option.
-
-Packages are versioned using Semver format. For non-zero MAJOR numbers, `^MAJOR.MINOR.PATCH` is interpreted as `MAJOR.x.x.`
-
-#### npm
-The `npm` client is the package manager which comes bundled with Node.js. By default, the packages are downloaded from `npmjs.com` registry, which is the default module registry.
-
-#### Programming Model
-A Node program can read the **command-line arguments** from the array of strings `process.argv`.
-The **environment variables** are available in the `process.env` object.
-`_filename` in Node.js holds the path of the file currently being executed
-
-> Node programs are often asynchronous and based on callbacks and event handlers. 
-> The programs do not exit until they are done running the initial file and until all callbacks have been called and there are no more pending events
-> A Node-based server program that listens for incoming network connections will theoretically run forever because it will always be waiting for more events.
->
-> Source: JavaScript: The Definitive Guide, 7th Edition by David Flanagan
-
-The default module for accessing the filesystem (`fs`) contains an asynchronous function (`fs.readFile`) for reading the contents of a file. Executing the function launches an asynchronous operation of reading the file. As soon as the contents have been read, the callback function is invoked and the contents are passed to that callback function.
-
-##### Callbacks
+#### Callbacks
 A **callback** is a function that will be called at some future point, once a task has been completed.
 1. You pass a callback function an input parameter to some asynchronous function.
 1. The asynchronous function will call the callback function as soon as it has finished the asynchronous processing
@@ -196,7 +121,7 @@ A **callback** is a function that will be called at some future point, once a ta
 - For a callback as a named function - see [example](examples/callbacks-named/callbacks-named.js)
 - For a callback as fat arrow function (lambda) - see [example](examples/callbacks-fat-arrow/callbacks-fat-arrow.js)
 
-##### Promises
+#### Promises
 - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise
 A **promise** is an object that represents an asynchronous operation. It's either `pending` or `settled`, and if it is `settled` it's either `resolved` or `rejected`. It is impossible to synchronously get the value of a Promise; you still register a callback function(s) for the Promise to call a when the value is ready. Promises represent the future results of single asynchronous computations.
 1. Some asynchronous function returns a `Promise` object, initially in `pending` state. 
@@ -279,7 +204,7 @@ async function runParallelReadTwoFiles (filePathsArray) {
 - If any of the promises fails, `Promise.all` will atomically reject.
 - `Promise.allSettled` can be used to tolerate errors in favor of getting necessary data. See [example](examples/callbacks-promise-allsettled/callbacks-promise-allsettled.js).
 
-##### Events
+#### Events
 The `EventEmitter` is used to drive event-driven logic. See a working [example](examples/events/events.js).
 ```javascript
 const ee = new EventEmitter()
@@ -293,7 +218,7 @@ ee.emit('tresholdExceeded', 15)
 - The `ee.once` registers a single-use listener - a one-time event handler, which is removed as soon as a first event occurs.
 - Emitting an event with `error` name will cause the event emitter to throw an exception unless an explicit listener for the `error` event has been registered
 
-##### Aborting asynchronous operations
+#### Aborting asynchronous operations
 To cancel asynchronous operations, `AbortController` can be used:
 - https://developer.mozilla.org/en-US/docs/Web/API/AbortController/AbortController
 
@@ -339,6 +264,90 @@ try {
 }
 ```
 Similarly, the `try-catch` construct can be used to catch errors thrown in an **asynchronous** function that `await`s asynchronous operations.
+
+#### Buffers
+`Buffer`s are used to represent a fixed-length sequence of bytes.
+
+Allocating a zero-filled buffer that can hold 10 bytes:
+```javascript
+const buf1 = Buffer.alloc(10);
+```
+
+#### The global object
+The global object is a regular JavaScript object whose properties are the globally defined identifiers that are available to a JavaScript program.
+
+In Node, the global object has a property named `global`.
+
+In web browsers, the Window object (`window`) serves as the global object for all JavaScript code contained in the browser window it represents. Web worker threads have a different global object: `self`.
+
+ES2020 defines `globalThis` as the standard way to refer to the global object in any context
+
+
+### Node.js
+Node.js is a JavaScript runtime built on Chrome's V8 JavaScript engine.
+The Node.js platform is almost entirely represented by the node binary executable. 
+
+To execute a JavaScript program: `node app.js`
+
+To check the syntax of a program: `node --check app.js`
+
+To preload (= execute first) a module (another JavaScript program): `node -r ./preload.js app.js`
+
+By default, a **stack trace** will contain the last ten stack frames (function call sites) at the point where the trace occurred. The stack trace limit can be modified with the `--stack-trace-limit` flag.
+
+To debug launch a program in Inspect mode:
+```bash
+node --inspect app.js
+node --inspect-brk app.js # with an breakpoint at the beginning of the program
+```
+Node.js supports the [Chrome Devtools remote debugging protocol](https://nodejs.org/en/docs/guides/debugging-getting-started/). There are various tools (i.e. Chrome browser - `chrome://inspect`) that support the debugging process. The breakpoints are set and stepped through in the tool chosen for debugging.
+
+#### Packages
+A **package** is basically just a folder with a `package.json` file and one or more JavaScript files.
+A Node.js application is also a package.
+
+The `npm init` command creates (or updates) the `package.json` file.
+
+The **dependencies** are installed with `npm install <name>` command. When you add a dependency:
+1. Its name and version (i.e. `d`) are added to the `dependencies` field in the `package.json` file
+1. The package files (and its dependencies) are added as a folder to `node_modules` folder inside the package folder
+1. The `package-lock.json` file id added/updated to contain a map of all package dependencies with their exact versions
+
+The `node_modules` folder must not be checked into Git. Check in the `package.json`. 
+When you clone a repo, you will then use `npm install` to recreate the `node_modules` folder.
+
+The `npm ls --depth=1000` describes the dependency tree of a package.
+
+The **development dependencies** are tools that support the development process. You can install the packages as development dependencies by using `npm install` with  `--save-dev` option. The development dependencies are added to the `devDependencies` field in the `package.json` file.
+```json
+"dependencies": {
+  "pino": "^7.6.2"
+},
+"devDependencies": {
+  "standard": "^16.0.4"
+}
+```
+When you want to install only production dependencies, but have some development dependencies in the `package.json` file, you can use `npm install` with `--production` option.
+
+Packages are versioned using Semver format. For non-zero MAJOR numbers, `^MAJOR.MINOR.PATCH` is interpreted as `MAJOR.x.x.`
+
+#### npm
+The `npm` client is the package manager which comes bundled with Node.js. By default, the packages are downloaded from `npmjs.com` registry, which is the default module registry.
+
+#### Programming Model
+A Node program can read the **command-line arguments** from the array of strings `process.argv`.
+The **environment variables** are available in the `process.env` object.
+`_filename` in Node.js holds the path of the file currently being executed
+
+> Node programs are often asynchronous and based on callbacks and event handlers. 
+> The programs do not exit until they are done running the initial file and until all callbacks have been called and there are no more pending events
+> A Node-based server program that listens for incoming network connections will theoretically run forever because it will always be waiting for more events.
+>
+> Source: JavaScript: The Definitive Guide, 7th Edition by David Flanagan
+
+The default module for accessing the filesystem (`fs`) contains an asynchronous function (`fs.readFile`) for reading the contents of a file. Executing the function launches an asynchronous operation of reading the file. As soon as the contents have been read, the callback function is invoked and the contents are passed to that callback function.
+
+
 
 
 #### Modules
